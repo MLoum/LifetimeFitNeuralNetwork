@@ -72,7 +72,7 @@ class Network(object):
                     j, self.evaluate(test_data), n_test))
             else:
                 print("Epoch {0} complete".format(j))
-        self.last_epoch_assess(test_data, epochs, eta)
+
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -152,12 +152,29 @@ class Network(object):
     def last_epoch_assess(self, test_data, epochs, eta):
         test_results = [(self.feedforward(x), y) for (x, y) in test_data]
         print("nb d'epochs :", epochs, "learning rate eta :", eta, "dimension du reseaux :", self.sizes)
+        erreurS_relative = []
+        tps_vie = []
         for result in test_results:
-            print("tps de vie vrai :", result[1], "tps de vie du réseau", result[0], "Erreur relative en % :", abs(result[0] - result[1])/result[1] * 100)
+            erreur_relative = abs(result[0] - result[1])/result[1] * 100
+            erreur_relative = erreur_relative[0]
+            print("tps de vie vrai :", result[1], "tps de vie du réseau", result[0], "Erreur relative en % :", erreur_relative)
+            erreurS_relative.append(erreur_relative)
+            tps_vie.append(result[1][0])
+
+        self.mean_erreur_relatives = np.mean(erreurS_relative)
+        self.std_erreur_relatives = np.std(erreurS_relative)
+        print("moyenne :" + str(self.mean_erreur_relatives) + "   std : " + str(self.std_erreur_relatives))
         plt.plot(np.arange(epochs), self.results)
         plt.xlabel("Numero epoch")
         plt.ylabel("Mean square error")
-        plt.title("learning rate :" + str(eta))
+        plt.title("learning rate :" + str(eta) + "sizes :" + str(self.sizes))
+        plt.savefig("apprentissage - epochs =" + str(epochs) + " - eta = " + str(eta) + " - sizes = " + str(self.sizes) + ".png")
+        plt.show()
+        plt.plot(tps_vie, erreurS_relative, "ro")
+        plt.title("Correlation ?")
+        plt.xlabel("Tps de vie")
+        plt.ylabel("Erreur relative")
+        plt.savefig("Correlation  - epochs =" + str(epochs) + " - eta = " + str(eta) + " - sizes = " + str(self.sizes) + ".png")
         plt.show()
 
 

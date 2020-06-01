@@ -91,7 +91,7 @@ class DecayGenerator():
 
         decay_data += np.random.random(self.time_idx.size) * noise
 
-        #return (decay_data, np.array([tau, noise]))
+        # return (decay_data, np.array([tau, noise]))
         return (decay_data.reshape((256, 1)), np.array([tau]).reshape(1, 1))
         # return (decay_data, np.array([tau]))
 
@@ -116,6 +116,11 @@ class DecayGenerator():
     def load(self):
         pass
 
+    def plot_test(self):
+        for training_data in self.training_data:
+            plt.semilogy(self.time_ns, training_data[0][0], label="tau = " + str(training_data[1][0]) + " ns")
+
+
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     params_dict_ = {}
@@ -124,13 +129,17 @@ if __name__ == "__main__":
     params_dict_["noise"] = [0, 0]
     params_dict_["nb_photon"] = [1000, 10000]
     params_dict_["t0"] = [0.5,0.5]
-    decay_generator = DecayGenerator(nb_trainning_decay=10, nb_test_decay=2, model="single_exp", params_dict=params_dict_)
+    decay_generator = DecayGenerator(nb_trainning_decay=5, nb_test_decay=2, model="single_exp", params_dict=params_dict_)
     decay_generator.generate_data()
 
     for training_data in decay_generator.training_data:
-        plt.semilogy(decay_generator.time_ns, training_data[0], label="tau = " + str(training_data[1][0]) + " ns")
+        plt.semilogy(decay_generator.time_ns, training_data[0], label="tau = " + str(training_data[1][0])[0:4] + " ns")
 
     plt.legend()
+    plt.xlabel("temps / ns")
+    plt.ylabel("Nbre de photon")
+    plt.title("Exemple de déclins mono-exponentiel")
+    plt.savefig("declins.png", dpi=300)
     plt.show()
 
 
